@@ -24,6 +24,11 @@ flacPaths = Dir.glob File.join "#{FLACDIR}", "**", "*.flac"
 totalCount = flacPaths.length
 puts "Found #{totalCount} songs."
 
+# Method to retrieve tags from FLAC media
+def getFLACTag path, tag
+    return %x( metaflac --show-tag="#{tag}" \""#{Shellwords.escape path}"\" ).sub /#{tag}=/, ""
+end
+
 flacPaths.each_with_index do | flacPath, flacCount |
     # Get relative path from root directory
     flacFile = flacPath.sub /^#{FLACDIR}/, ""
@@ -67,6 +72,15 @@ flacPaths.each_with_index do | flacPath, flacCount |
         puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/album.jpg"
         raise "Resizing of artwork failed" unless system( artworkResizeCommand.join( " " ) )
     end
+
+    # Determine tags
+    titleTag = getFLACTag( flacPath, "TITLE" )
+    artistTag = getFLACTag( flacPath, "ARTIST" )
+    albumTag = getFLACTag( flacPath, "ALBUM" )
+    trackNumberTag = getFLACTag( flacPath, "TRACKNUMBER" )
+    commentTag = getFLACTag( flacPath, "COMMENT" )
+    yearTag = getFLACTag( flacPath, "DATE" )
+    genreTag = getFLACTag( flacPath, "GENRE" )
 end
 
 exit 0
