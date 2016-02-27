@@ -38,6 +38,14 @@ flacPaths.each_with_index do | flacPath, flacCount |
         puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/"
         Dir.mkdir f32ArtistPath
     end
+
+    # Create FAT32-safe album directory
+    f32Album = getFAT32SafeName album
+    f32AlbumPath = File.join f32ArtistPath, f32Album
+    unless Dir.exist? f32AlbumPath
+        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/"
+        Dir.mkdir f32AlbumPath
+    end
 end
 
 exit 0
