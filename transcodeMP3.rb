@@ -7,6 +7,7 @@
 require_relative "fat32safename"
 
 require "fileutils"
+require "shellwords"
 
 raise ArgumentError, "Too many arguments" unless ARGV.length == 2
 
@@ -45,6 +46,26 @@ flacPaths.each_with_index do | flacPath, flacCount |
     unless Dir.exist? f32AlbumPath
         puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/"
         Dir.mkdir f32AlbumPath
+    end
+
+    # Resize artwork if found
+    artwork = File.join File.dirname( flacPath ), "album.jpg"
+    if File.exist? artwork
+        f32ArtworkPath = File.join f32AlbumPath, "album.jpg"
+    else
+        artwork = ""
+        f32ArtworkPath = ""
+    end
+
+    artworkResizeCommand = Array.new
+    artworkResizeCommand.push "convert"
+    artworkResizeCommand.push "-resize 300x300"
+    artworkResizeCommand.push Shellwords.escape artwork
+    artworkResizeCommand.push Shellwords.escape f32ArtworkPath
+
+    unless artwork.empty? or File.exist? f32ArtworkPath
+        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/album.jpg"
+        raise "Resizing of artwork failed" unless system( artworkResizeCommand.join( " " ) )
     end
 end
 
