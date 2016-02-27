@@ -18,7 +18,10 @@ FileUtils.mkpath MP3DIR unless Dir.exist? MP3DIR
 raise ArgumentError, "MP3 library not found" unless Dir.exist? MP3DIR
 
 # Gather paths to all FLAC media in the flac library
+puts "Reading FLAC libary..."
 flacPaths = Dir.glob File.join "#{FLACDIR}", "**", "*.flac"
+totalCount = flacPaths.length
+puts "Found #{totalCount} songs."
 
 flacPaths.each do | flacPath |
     # Get relative path from root directory
