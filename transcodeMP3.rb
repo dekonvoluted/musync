@@ -37,5 +37,12 @@ def getFAT32SafeName badName
     return safeName
 end
 
+# Gather paths to all FLAC media in the flac library
+flacPaths = Dir.glob File.join "#{FLACDIR}", "**", "*.flac"
+
+flacPaths.each do | flacPath |
+    puts flacPath
+end
+
 exit 0
 
