@@ -27,6 +27,13 @@ flacPaths.each do | flacPath |
     # Deduce artist, album and song from path
     artist, album, song = flacFile.split "/"
     raise ArgumentError, "Artist/Album/Song hierarchy not found" if artist.empty? or album.empty? or song.empty?
+
+    # Create FAT32-safe artist directory
+    f32Artist = getFAT32SafeName artist
+    f32ArtistPath = File.join MP3DIR, f32Artist
+    unless Dir.exist? f32ArtistPath
+        Dir.mkdir f32ArtistPath
+    end
 end
 
 exit 0
