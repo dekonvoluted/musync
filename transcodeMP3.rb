@@ -21,7 +21,12 @@ raise ArgumentError, "MP3 library not found" unless Dir.exist? MP3DIR
 flacPaths = Dir.glob File.join "#{FLACDIR}", "**", "*.flac"
 
 flacPaths.each do | flacPath |
-    puts flacPath
+    # Get relative path from root directory
+    flacFile = flacPath.sub /^#{FLACDIR}/, ""
+
+    # Deduce artist, album and song from path
+    artist, album, song = flacFile.split "/"
+    raise ArgumentError, "Artist/Album/Song hierarchy not found" if artist.empty? or album.empty? or song.empty?
 end
 
 exit 0
