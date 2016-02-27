@@ -37,3 +37,5 @@ def getFAT32SafeName badName
     return safeName
 end
 
+exit 0
+
