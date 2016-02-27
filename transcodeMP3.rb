@@ -23,7 +23,7 @@ flacPaths = Dir.glob File.join "#{FLACDIR}", "**", "*.flac"
 totalCount = flacPaths.length
 puts "Found #{totalCount} songs."
 
-flacPaths.each do | flacPath |
+flacPaths.each_with_index do | flacPath, flacCount |
     # Get relative path from root directory
     flacFile = flacPath.sub /^#{FLACDIR}/, ""
 
@@ -35,6 +35,7 @@ flacPaths.each do | flacPath |
     f32Artist = getFAT32SafeName artist
     f32ArtistPath = File.join MP3DIR, f32Artist
     unless Dir.exist? f32ArtistPath
+        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/"
         Dir.mkdir f32ArtistPath
     end
 end
