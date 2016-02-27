@@ -81,6 +81,40 @@ flacPaths.each_with_index do | flacPath, flacCount |
     commentTag = getFLACTag( flacPath, "COMMENT" )
     yearTag = getFLACTag( flacPath, "DATE" )
     genreTag = getFLACTag( flacPath, "GENRE" )
+
+    # Prepare to decode FLAC and encode MP3 with ID3V2 tags
+    song.sub! /\.flac$/, ".mp3"
+    f32Song = getFAT32SafeName song
+    f32SongPath = File.join f32AlbumPath, f32Song
+
+    flacDecodeCommand = Array.new
+    flacDecodeCommand.push "flac"
+    flacDecodeCommand.push "--decode"
+    flacDecodeCommand.push "--silent"
+    flacDecodeCommand.push "--stdout"
+    flacDecodeCommand.push Shellwords.escape flacPath
+
+    mp3EncodeCommand = Array.new
+    mp3EncodeCommand.push "lame"
+    mp3EncodeCommand.push "--silent"
+    mp3EncodeCommand.push "--preset medium"
+    mp3EncodeCommand.push "--id3v2-only"
+    mp3EncodeCommand.push "--id3v2-utf16"
+    mp3EncodeCommand.push "--tt #{Shellwords.escape titleTag}"
+    mp3EncodeCommand.push "--ta #{Shellwords.escape artistTag}"
+    mp3EncodeCommand.push "--tl #{Shellwords.escape albumTag}"
+    mp3EncodeCommand.push "--tn #{Shellwords.escape trackNumberTag}"
+    mp3EncodeCommand.push "--tc #{Shellwords.escape commentTag}"
+    mp3EncodeCommand.push "--ty #{Shellwords.escape yearTag}"
+    mp3EncodeCommand.push "--tg #{Shellwords.escape genreTag}"
+    mp3EncodeCommand.push "--ti #{Shellwords.escape f32ArtworkPath}" unless f32ArtworkPath.empty?
+    mp3EncodeCommand.push "-"
+    mp3EncodeCommand.push Shellwords.escape f32SongPath
+
+    unless File.exist? f32SongPath
+        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/#{f32Song}"
+        raise "Encoding media failed" unless system( "#{flacDecodeCommand.join( " " )} | #{mp3EncodeCommand.join( " " )}" )
+    end
 end
 
 exit 0
