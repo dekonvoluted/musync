@@ -73,6 +73,12 @@ flacPaths.each_with_index do | flacPath, flacCount |
         raise "Resizing of artwork failed" unless system( artworkResizeCommand.join( " " ) )
     end
 
+    # Prepare to decode FLAC and encode MP3 with ID3V2 tags
+    song.sub! /\.flac$/, ".mp3"
+    f32Song = getFAT32SafeName song
+    f32SongPath = File.join f32AlbumPath, f32Song
+    next if File.exist? f32SongPath
+
     # Determine tags
     titleTag = getFLACTag( flacPath, "TITLE" )
     artistTag = getFLACTag( flacPath, "ARTIST" )
@@ -81,11 +87,6 @@ flacPaths.each_with_index do | flacPath, flacCount |
     commentTag = getFLACTag( flacPath, "COMMENT" )
     yearTag = getFLACTag( flacPath, "DATE" )
     genreTag = getFLACTag( flacPath, "GENRE" )
-
-    # Prepare to decode FLAC and encode MP3 with ID3V2 tags
-    song.sub! /\.flac$/, ".mp3"
-    f32Song = getFAT32SafeName song
-    f32SongPath = File.join f32AlbumPath, f32Song
 
     flacDecodeCommand = Array.new
     flacDecodeCommand.push "flac"
