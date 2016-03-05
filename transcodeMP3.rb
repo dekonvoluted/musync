@@ -4,7 +4,7 @@
 # Keep libraries in sync
 # Keep MP3 library file names FAT32-compatible
 
-require_relative "fat32safename"
+require_relative "fat32"
 
 require "fileutils"
 require "shellwords"
@@ -38,7 +38,7 @@ flacPaths.each_with_index do | flacPath, flacCount |
     raise ArgumentError, "Artist/Album/Song hierarchy not found" if artist.empty? or album.empty? or song.empty?
 
     # Create FAT32-safe artist directory
-    f32Artist = getFAT32SafeName artist
+    f32Artist = FAT32.safeName artist
     f32ArtistPath = File.join MP3DIR, f32Artist
     unless Dir.exist? f32ArtistPath
         puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/"
@@ -46,7 +46,7 @@ flacPaths.each_with_index do | flacPath, flacCount |
     end
 
     # Create FAT32-safe album directory
-    f32Album = getFAT32SafeName album
+    f32Album = FAT32.safeName album
     f32AlbumPath = File.join f32ArtistPath, f32Album
     unless Dir.exist? f32AlbumPath
         puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/"
@@ -75,7 +75,7 @@ flacPaths.each_with_index do | flacPath, flacCount |
 
     # Prepare to decode FLAC and encode MP3 with ID3V2 tags
     song.sub! /\.flac$/, ".mp3"
-    f32Song = getFAT32SafeName song
+    f32Song = FAT32.safeName song
     f32SongPath = File.join f32AlbumPath, f32Song
     next if File.exist? f32SongPath
 

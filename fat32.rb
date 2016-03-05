@@ -1,5 +1,7 @@
+module FAT32
+    # Create FAT32-safe file/directory names
+    def self.safeName badName
 # Create FAT32-safe file/directory names
-def getFAT32SafeName badName
     # Avoid strings longer than 240 characters (with .mp3 extension)
     safeName = badName.slice( 0, 236 )
 
@@ -18,6 +20,7 @@ def getFAT32SafeName badName
     safeName = "dot" if safeName == "."
 
     return safeName
+    end
 end
 
 
