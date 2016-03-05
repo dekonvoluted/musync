@@ -1,26 +1,24 @@
 module FAT32
     # Create FAT32-safe file/directory names
     def self.safeName badName
-# Create FAT32-safe file/directory names
-    # Avoid strings longer than 240 characters (with .mp3 extension)
-    safeName = badName.slice( 0, 236 )
+        # Avoid strings longer than 240 characters (with .mp3 extension)
+        goodName = badName.slice( 0, 236 )
 
-    # Allow only safe characters
-    badCharacters = /[^a-zA-Z0-9\.\-\ ]/
-    safeName.gsub! badCharacters, "_"
+        # Allow only safe characters
+        badCharacters = /[^a-zA-Z0-9\.\-\ ]/
+        goodName.gsub! badCharacters, "_"
 
-    # Avoid leading/trailing spaces or dots
-    safeName.gsub! /^\s/, "_"
-    safeName.gsub! /\s$/, "_"
-    safeName.gsub! /^\./, "_"
-    safeName.gsub! /\.$/, "_"
+        # Avoid leading/trailing spaces or dots
+        goodName.gsub! /^\s/, "_"
+        goodName.gsub! /\s$/, "_"
+        goodName.gsub! /^\./, "_"
+        goodName.gsub! /\.$/, "_"
 
-    # Avoid empty or "." file names
-    safeName = "empty" if safeName.empty?
-    safeName = "dot" if safeName == "."
+        # Avoid empty or "." file names
+        goodName = "empty" if goodName.empty?
+        goodName = "dot" if goodName == "."
 
-    return safeName
+        return goodName
     end
 end
-
 
