@@ -24,6 +24,41 @@ class FlacFile
         end
     end
 
+    # Decode to raw WAV data
+    def to_wav
+        # Require that the file exist
+        raise "File not found" unless File.exist? @flacPath
+
+        # Check if flac exists
+        raise "flac: Command not found" unless system( "which flac &> /dev/null" )
+
+        # Decode the FLAC file
+        return %x( flac --silent --decode --stdout \""#{Shellwords.escape @flacPath}"\" )
+    end
+
+    # Encode from raw WAV data
+    def from_wav data
+        # Check if flac exists
+        raise "flac: Command not found" unless system( "which flac &> /dev/null" )
+
+        # Compose the encode command
+        flacEncodeCommand = Array.new
+        flacEncodeCommand.push "flac"
+        flacEncodeCommand.push "--silent"
+        flacEncodeCommand.push "--output-name=#{Shellwords.escape @flacPath}"
+        flacEncodeCommand.push "-"
+
+        # Encode the FLAC file
+        #%x( echo -n "#{data}" | "#{flacDecodeCommand.join( " " )}" )
+        #raise "Encoding FLAC file failed" unless system( "#{flacDecodeCommand.join( " " )} < ( echo \'#{data}\' )" )
+        IO.popen( "#{flacEncodeCommand.join( " " )} << 'ENDOFWAV'" ) do | io |
+            io.puts data
+            io.puts "ENDOFWAV"
+        end
+
+        return @flacPath
+    end
+
     # Write out mp3 encoded version
     def to_mp3 mp3Path
         # Require that the file exist
