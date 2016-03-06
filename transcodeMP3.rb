@@ -30,7 +30,7 @@ puts "Reading MP3 library: #{MP3DIR}"
 filesToTranscode = Hash.new
 flacPaths.each do | flacPath |
     # Get relative path of FLAC file
-    flacFile = flacPath.sub /^#{FLACDIR}/, ""
+    flacFile = flacPath.sub /^#{FLACDIR}\/?/, ""
 
     # Get FAT32 safe relative path for MP3 file
     mp3File = flacFile.sub /flac$/i, "mp3"
