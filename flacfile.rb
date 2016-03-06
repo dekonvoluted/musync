@@ -22,6 +22,9 @@ class FlacFile
             tag = line.chomp.split "="
             @tags[ tag.at( 0 ).upcase ] = tag.at( 1 )
         end
+
+        # Use track number to handle disk numbers as well
+        @tags[ "TRACKNUMBER" ] = @tags[ "TRACKNUMBER" ].to_i + 100 * @tags[ "DISCNUMBER" ].to_i unless @tags[ "TRACKNUMBER" ].nil?
     end
 
     # Write out mp3 encoded version
