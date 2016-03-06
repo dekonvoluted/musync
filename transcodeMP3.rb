@@ -4,6 +4,7 @@
 # Keep libraries in sync
 # Keep MP3 library file names FAT32-compatible
 
+require_relative "artfile"
 require_relative "fat32"
 require_relative "flacfile"
 
@@ -54,6 +55,21 @@ flacPaths.each_with_index do | flacPath, flacCount |
     f32Song = FAT32.safeName song
     f32SongPath = File.join f32AlbumPath, f32Song
     next if File.exist? f32SongPath
+
+    # Resize artwork if found
+    # Resize artwork if found
+    artwork = File.join File.dirname( flacPath ), "album.jpg"
+    if File.exist? artwork
+        f32ArtworkPath = File.join f32AlbumPath, "album.jpg"
+    else
+        artwork = ""
+        f32ArtworkPath = ""
+    end
+
+    unless artwork.empty? or File.exist? f32ArtworkPath
+        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/album.jpg"
+        ArtFile.new( artwork ).resize f32ArtworkPath, "300x300"
+    end
 
     puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/#{f32Song}"
     FlacFile.new( flacPath ).to_mp3 f32SongPath
