@@ -26,53 +26,53 @@ flacPaths = Dir.glob File.join "#{FLACDIR}", "**", "*.flac"
 totalCount = flacPaths.length
 puts "Found #{totalCount} songs."
 
-flacPaths.each_with_index do | flacPath, flacCount |
-    # Get relative path from root directory
+filesToTranscode = Hash.new
+flacPaths.each do | flacPath |
+    # Get relative path of FLAC file
     flacFile = flacPath.sub /^#{FLACDIR}/, ""
 
-    # Deduce artist, album and song from path
-    artist, album, song = flacFile.split "/"
-    raise ArgumentError, "Artist/Album/Song hierarchy not found" if artist.empty? or album.empty? or song.empty?
-
-    # Create FAT32-safe artist directory
-    f32Artist = FAT32.safeName artist
-    f32ArtistPath = File.join MP3DIR, f32Artist
-    unless Dir.exist? f32ArtistPath
-        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/"
-        Dir.mkdir f32ArtistPath
+    # Get FAT32 safe relative path for MP3 file
+    mp3File = flacFile.sub /flac$/i, "mp3"
+    mp3File.split( "/" ).each do | mp3Dir |
+        mp3Dir = FAT32.safeName mp3Dir
     end
 
-    # Create FAT32-safe album directory
-    f32Album = FAT32.safeName album
-    f32AlbumPath = File.join f32ArtistPath, f32Album
-    unless Dir.exist? f32AlbumPath
-        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/"
-        Dir.mkdir f32AlbumPath
+    # Skip existing mp3 files
+    next if File.exist? File.join MP3DIR, mp3File
+
+    # Record files to encode
+    filesToTranscode[ flacFile ] = mp3File
+end
+
+exit 0 if filesToTranscode.empty?
+
+flacCount = 0
+totalCount = filesToTranscode.size
+filesToTranscode.each_pair do | flacFile, mp3File |
+    flacCount += 1
+
+    # Create missing directories
+    unless File.exist? File.join MP3DIR, File.dirname( mp3File )
+        puts "#{flacCount}/#{totalCount} Creating #{File.join MP3DIR, File.dirname( mp3File )}"
+        FileUtils.mkdir_p File.join MP3DIR, File.dirname( mp3File )
     end
 
-    # Prepare to decode FLAC and encode MP3 with ID3V2 tags
-    song.sub! /\.flac$/, ".mp3"
-    f32Song = FAT32.safeName song
-    f32SongPath = File.join f32AlbumPath, f32Song
-    next if File.exist? f32SongPath
-
     # Resize artwork if found
-    # Resize artwork if found
-    artwork = File.join File.dirname( flacPath ), "album.jpg"
+    artwork = File.join FLACDIR, File.dirname( flacFile ), "album.jpg"
     if File.exist? artwork
-        f32ArtworkPath = File.join f32AlbumPath, "album.jpg"
+        artFile = File.join MP3DIR, File.dirname( mp3File ), "album.jpg"
     else
         artwork = ""
-        f32ArtworkPath = ""
+        artFile = ""
     end
 
-    unless artwork.empty? or File.exist? f32ArtworkPath
-        puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/album.jpg"
-        ArtFile.new( artwork ).resize f32ArtworkPath, "300x300"
+    unless artwork.empty? or File.exist? artFile
+        puts "#{flacCount}/#{totalCount} Creating #{File.join File.dirname( mp3File ), File.basename( artFile )}"
+        ArtFile.new( artwork ).resize artFile, "300x300"
     end
 
-    puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/#{f32Song}"
-    FlacFile.new( flacPath ).to_mp3 f32SongPath, f32ArtworkPath
+    puts "#{flacCount}/#{totalCount} Creating #{mp3File}"
+    FlacFile.new( File.join FLACDIR, flacFile ).to_mp3 File.join( MP3DIR, mp3File ), artFile
 end
 
 exit 0
