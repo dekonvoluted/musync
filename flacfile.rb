@@ -56,9 +56,9 @@ class FlacFile
         mp3EncodeCommand.push "--tt #{Shellwords.escape @tags[ "TITLE" ]}"
         mp3EncodeCommand.push "--ta #{Shellwords.escape @tags[ "ARTIST" ]}"
         mp3EncodeCommand.push "--tl #{Shellwords.escape @tags[ "ALBUM" ]}"
-        mp3EncodeCommand.push "--tn #{@tags[ "TRACKNUMBER"].to_i}"
+        mp3EncodeCommand.push "--tn #{@tags[ "TRACKNUMBER"].to_i}" unless @tags[ "TRACKNUMBER" ].nil?
         mp3EncodeCommand.push "--tc #{Shellwords.escape @tags[ "COMMENT"]}"
-        mp3EncodeCommand.push "--ty #{@tags[ "DATE"].to_i}"
+        mp3EncodeCommand.push "--ty #{@tags[ "DATE"].to_i}" unless @tags[ "DATE" ].nil?
         mp3EncodeCommand.push "--tg #{Shellwords.escape @tags[ "GENRE"]}"
         mp3EncodeCommand.push "--ti #{Shellwords.escape artworkPath}" unless artworkPath.empty?
         mp3EncodeCommand.push "-"
