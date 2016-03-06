@@ -50,6 +50,52 @@ end
 puts "Found #{filesToTranscode.size} files to transcode."
 exit 0 if filesToTranscode.empty?
 
+# Find preferred album artwork
+def get_artwork directory
+    # Search for suitable artwork by priority
+    artPaths = Dir.glob File.join directory, "*.jpg"
+
+    artwork = File.join directory, "album.jpg"
+    if artPaths.include? artwork
+        return artwork
+    end
+
+    artwork = File.join directory, "folder.jpg"
+    if artPaths.include? artwork
+        return artwork
+    end
+
+    artPaths += Dir.glob File.join directory, "*.jpeg"
+
+    artwork = File.join directory, "album.jpeg"
+    if artPaths.include? artwork
+        return artwork
+    end
+
+    artwork = File.join directory, "folder.jpeg"
+    if artPaths.include? artwork
+        return artwork
+    end
+
+    artPaths += Dir.glob File.join directory, "*.png"
+
+    artwork = File.join directory, "album.png"
+    if artPaths.include? artwork
+        return artwork
+    end
+
+    artwork = File.join directory, "folder.png"
+    if artPaths.include? artwork
+        return artwork
+    end
+
+    # Return lone artwork if found
+    return artPaths.at 0 if artPaths.size == 1
+
+    # No suitable artwork found
+    return ""
+end
+
 puts "Writing MP3 library: #{MP3DIR}"
 flacCount = 0
 totalCount = filesToTranscode.size
@@ -63,17 +109,15 @@ filesToTranscode.each_pair do | flacFile, mp3File |
     end
 
     # Resize artwork if found
-    artwork = File.join FLACDIR, File.dirname( flacFile ), "album.jpg"
-    if File.exist? artwork
-        artFile = File.join MP3DIR, File.dirname( mp3File ), "album.jpg"
-    else
-        artwork = ""
-        artFile = ""
-    end
+    artwork = get_artwork File.join FLACDIR, File.dirname( flacFile )
+    artFile = ""
+    unless artwork.empty?
+        artFile = File.join MP3DIR, artwork.sub( /^#{FLACDIR}\/?/, "" )
 
-    unless artwork.empty? or File.exist? artFile
-        puts "#{flacCount}/#{totalCount} Creating #{File.join File.dirname( mp3File ), File.basename( artFile )}"
-        ArtFile.new( artwork ).resize artFile, "300x300"
+        unless File.exist? artFile
+            puts "#{flacCount}/#{totalCount} Creating #{File.join File.dirname( mp3File ), File.basename( artFile )}"
+            ArtFile.new( artwork ).resize artFile, "300x300"
+        end
     end
 
     puts "#{flacCount}/#{totalCount} Creating #{mp3File}"
