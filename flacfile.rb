@@ -5,14 +5,14 @@ class FlacFile
         # Require that the filename end with the correct extension
         raise "Invalid FLAC filename" unless File.extname( path ).downcase == ".flac"
 
-        # Require that the file exist
-        raise "File not found" unless File.exist? path
-
         @flacPath = path
     end
 
     # Parse embedded tags in the flac file
     def parseTags
+        # Require that the file exist
+        raise "File not found" unless File.exist? @flacPath
+
         # Check if metaflac exists
         raise "metaflac: Command not found" unless system( "which metaflac &> /dev/null" )
 
@@ -26,6 +26,9 @@ class FlacFile
 
     # Write out mp3 encoded version
     def to_mp3 mp3Path
+        # Require that the file exist
+        raise "File not found" unless File.exist? @flacPath
+
         # Check if flac exists
         raise "flac: Command not found" unless system( "which flac &> /dev/null" )
 
