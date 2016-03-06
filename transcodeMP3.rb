@@ -72,7 +72,7 @@ flacPaths.each_with_index do | flacPath, flacCount |
     end
 
     puts "#{flacCount}/#{totalCount} Creating #{f32Artist}/#{f32Album}/#{f32Song}"
-    FlacFile.new( flacPath ).to_mp3 f32SongPath
+    FlacFile.new( flacPath ).to_mp3 f32SongPath, f32ArtworkPath
 end
 
 exit 0

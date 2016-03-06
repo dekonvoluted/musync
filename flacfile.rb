@@ -25,7 +25,7 @@ class FlacFile
     end
 
     # Write out mp3 encoded version
-    def to_mp3 mp3Path
+    def to_mp3 mp3Path, artworkPath = ""
         # Require that the file exist
         raise "File not found" unless File.exist? @flacPath
 
@@ -60,6 +60,7 @@ class FlacFile
         mp3EncodeCommand.push "--tc #{Shellwords.escape @tags[ "COMMENT"]}"
         mp3EncodeCommand.push "--ty #{@tags[ "DATE"].to_i}"
         mp3EncodeCommand.push "--tg #{Shellwords.escape @tags[ "GENRE"]}"
+        mp3EncodeCommand.push "--ti #{Shellwords.escape artworkPath}" unless artworkPath.empty?
         mp3EncodeCommand.push "-"
         mp3EncodeCommand.push Shellwords.escape mp3Path
 
