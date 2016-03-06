@@ -21,11 +21,12 @@ FileUtils.mkpath MP3DIR unless Dir.exist? MP3DIR
 raise ArgumentError, "MP3 library not found" unless Dir.exist? MP3DIR
 
 # Gather paths to all FLAC media in the flac library
-puts "Reading FLAC libary..."
+puts "Reading FLAC libary: #{FLACDIR}"
 flacPaths = Dir.glob File.join "#{FLACDIR}", "**", "*.flac"
 totalCount = flacPaths.length
 puts "Found #{totalCount} songs."
 
+puts "Reading MP3 library: #{MP3DIR}"
 filesToTranscode = Hash.new
 flacPaths.each do | flacPath |
     # Get relative path of FLAC file
@@ -44,8 +45,10 @@ flacPaths.each do | flacPath |
     filesToTranscode[ flacFile ] = mp3File
 end
 
+puts "Found #{filesToTranscode.size} files to transcode."
 exit 0 if filesToTranscode.empty?
 
+puts "Writing MP3 library: #{MP3DIR}"
 flacCount = 0
 totalCount = filesToTranscode.size
 filesToTranscode.each_pair do | flacFile, mp3File |
@@ -53,7 +56,7 @@ filesToTranscode.each_pair do | flacFile, mp3File |
 
     # Create missing directories
     unless File.exist? File.join MP3DIR, File.dirname( mp3File )
-        puts "#{flacCount}/#{totalCount} Creating #{File.join MP3DIR, File.dirname( mp3File )}"
+        puts "#{flacCount}/#{totalCount} Creating #{File.dirname( mp3File )}"
         FileUtils.mkdir_p File.join MP3DIR, File.dirname( mp3File )
     end
 
