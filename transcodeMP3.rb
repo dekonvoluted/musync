@@ -112,7 +112,7 @@ filesToTranscode.each_pair do | flacFile, mp3File |
     artwork = get_artwork File.join FLACDIR, File.dirname( flacFile )
     artFile = ""
     unless artwork.empty?
-        artFile = File.join MP3DIR, artwork.sub( /^#{FLACDIR}\/?/, "" )
+        artFile = File.join MP3DIR, File.dirname( mp3File ), File.basename( artwork )
 
         unless File.exist? artFile
             puts "#{flacCount}/#{totalCount} Creating #{File.join File.dirname( mp3File ), File.basename( artFile )}"
