@@ -34,9 +34,11 @@ flacPaths.each do | flacPath |
 
     # Get FAT32 safe relative path for MP3 file
     mp3File = flacFile.sub /flac$/i, "mp3"
-    mp3File.split( "/" ).each do | mp3Dir |
-        mp3Dir = FAT32.safeName mp3Dir
+    mp3File = mp3File.split "/"
+    mp3File.map! do | mp3Dir |
+        FAT32.safeName mp3Dir
     end
+    mp3File = File.join mp3File
 
     # Skip existing mp3 files
     next if File.exist? File.join MP3DIR, mp3File
