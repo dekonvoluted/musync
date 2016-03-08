@@ -55,7 +55,7 @@ class FlacFile
         mp3EncodeCommand.push "--silent"
         mp3EncodeCommand.push "--preset medium"
         mp3EncodeCommand.push "--id3v2-only"
-        mp3EncodeCommand.push "--id3v2-utf16"
+        mp3EncodeCommand.push "--id3v2-latin1"
         mp3EncodeCommand.push "--tt #{Shellwords.escape @tags[ "TITLE" ]}"
         mp3EncodeCommand.push "--ta #{Shellwords.escape @tags[ "ARTIST" ]}"
         mp3EncodeCommand.push "--tl #{Shellwords.escape @tags[ "ALBUM" ]}"
