@@ -1,6 +1,6 @@
 module FAT32
-    # Create FAT32-safe file/directory names
-    def self.safeName badName
+    # Return FAT32-safe string
+    def self.safename badName
         # Avoid strings longer than 240 characters
         goodName = badName.slice( 0, 240 )
 
