@@ -1,24 +1,23 @@
+require_relative "mufile"
+
 require "shellwords"
 
-class FlacFile
-    def initialize path
-        # Require that the filename end with the correct extension
-        raise "Invalid FLAC filename" unless File.extname( path ).downcase == ".flac"
+class FlacFile < MuFile
 
-        @flacPath = path
-    end
+    # Specify valid extensions
+    @valid_extensions = [ ".flac" ]
+
+    # Specify error message
+    @invalid_extension_message = "Invalid extension for FLAC file"
 
     # Parse embedded tags in the flac file
     def parseTags
-        # Require that the file exist
-        raise "File not found" unless File.exist? @flacPath
-
         # Check if metaflac exists
         raise "metaflac: Command not found" unless system( "which metaflac &> /dev/null" )
 
         # Parse tags
         @tags = Hash.new
-        %x( metaflac --export-tags-to=- \""#{Shellwords.escape @flacPath}"\" ).each_line do | line |
+        %x( metaflac --export-tags-to=- \""#{Shellwords.escape File.join( @base_directory, @relative_path )}"\" ).each_line do | line |
             tag = line.chomp.split "="
             @tags[ tag.at( 0 ).upcase ] = tag.at( 1 )
         end
@@ -29,9 +28,6 @@ class FlacFile
 
     # Write out mp3 encoded version
     def to_mp3 mp3Path, artworkPath = ""
-        # Require that the file exist
-        raise "File not found" unless File.exist? @flacPath
-
         # Check if flac exists
         raise "flac: Command not found" unless system( "which flac &> /dev/null" )
 
@@ -47,7 +43,7 @@ class FlacFile
         flacDecodeCommand.push "--silent"
         flacDecodeCommand.push "--decode"
         flacDecodeCommand.push "--stdout"
-        flacDecodeCommand.push Shellwords.escape @flacPath
+        flacDecodeCommand.push Shellwords.escape File.join( @base_directory, @relative_path )
 
         # Compose the encode command
         mp3EncodeCommand = Array.new
