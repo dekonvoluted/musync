@@ -45,6 +45,21 @@ class FlacFile < MuFile
         return File.join @base_directory, @relative_path.sub( /flac$/i, "wav" )
     end
 
+    # Write out tags
+    def to_ini
+        # Check if metaflac exists
+        raise "metaflac: Command not found" unless system( "which metaflac &> /dev/null" )
+
+        # Parse tags
+        tags = %x( metaflac --export-tags-to=- \""#{Shellwords.escape File.join( @base_directory, @relative_path )}"\" )
+        tagFile = File.join @base_directory, @relative_path.sub( /flac$/i, "ini" )
+        File.open tagFile, "w" do | ini |
+            ini.puts tags
+        end
+
+        return tagFile
+    end
+
     # Write out mp3 encoded version
     def to_mp3 mp3Path, artworkPath = ""
         # Check if flac exists
