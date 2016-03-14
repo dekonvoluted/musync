@@ -26,6 +26,25 @@ class FlacFile < MuFile
         @tags[ "TRACKNUMBER" ] = @tags[ "TRACKNUMBER" ].to_i + 100 * @tags[ "DISCNUMBER" ].to_i unless @tags[ "TRACKNUMBER" ].nil?
     end
 
+    # Write out the decoded WAV file
+    def to_wav
+        # Check if flac exists
+        raise "flac: Command not found" unless system( "which flac &> /dev/null" )
+
+        # Compose the decode command
+        flacDecodeCommand = Array.new
+        flacDecodeCommand.push "flac"
+        flacDecodeCommand.push "--silent"
+        flacDecodeCommand.push "--decode"
+        flacDecodeCommand.push Shellwords.escape File.join( @base_directory, @relative_path )
+
+        # Decode the FLAC file to WAV
+        raise "Decoding media failed" unless system( flacDecodeCommand.join( " " ) )
+
+        # Return the decoded WAV file path
+        return File.join @base_directory, @relative_path.sub( /flac$/i, "wav" )
+    end
+
     # Write out mp3 encoded version
     def to_mp3 mp3Path, artworkPath = ""
         # Check if flac exists
