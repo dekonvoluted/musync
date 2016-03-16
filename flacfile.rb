@@ -10,23 +10,7 @@ class FlacFile < MuFile
     # Specify error message
     @invalid_extension_message = "Invalid extension for FLAC file"
 
-    # Parse embedded tags in the flac file
-    def parseTags
-        # Check if metaflac exists
-        raise "metaflac: Command not found" unless system( "which metaflac &> /dev/null" )
-
-        # Parse tags
-        @tags = Hash.new
-        %x( metaflac --export-tags-to=- \""#{Shellwords.escape File.join( @base_directory, @relative_path )}"\" ).each_line do | line |
-            tag = line.chomp.split "="
-            @tags[ tag.at( 0 ).upcase ] = tag.at( 1 )
-        end
-
-        # Use track number to handle disk numbers as well
-        @tags[ "TRACKNUMBER" ] = @tags[ "TRACKNUMBER" ].to_i + 100 * @tags[ "DISCNUMBER" ].to_i unless @tags[ "TRACKNUMBER" ].nil?
-    end
-
-    # Write out the decoded WAV file
+    # Return decoded WAV data
     def to_wav
         # Check if flac exists
         raise "flac: Command not found" unless system( "which flac &> /dev/null" )
@@ -36,28 +20,45 @@ class FlacFile < MuFile
         flacDecodeCommand.push "flac"
         flacDecodeCommand.push "--silent"
         flacDecodeCommand.push "--decode"
+        flacDecodeCommand.push "--stdout"
         flacDecodeCommand.push Shellwords.escape File.join( @base_directory, @relative_path )
 
         # Decode the FLAC file to WAV
-        raise "Decoding media failed" unless system( flacDecodeCommand.join( " " ) )
+        wavData = String.new
+        IO.popen( flacDecodeCommand.join( " " ) ) do | io |
+            wavData = io.read
+        end
 
-        # Return the decoded WAV file path
-        return File.join @base_directory, @relative_path.sub( /flac$/i, "wav" )
+        return wavData
     end
 
-    # Write out tags
-    def to_ini
+    # Return parsed tags
+    def tags
+
         # Check if metaflac exists
         raise "metaflac: Command not found" unless system( "which metaflac &> /dev/null" )
 
         # Parse tags
-        tags = %x( metaflac --export-tags-to=- \""#{Shellwords.escape File.join( @base_directory, @relative_path )}"\" )
-        tagFile = File.join @base_directory, @relative_path.sub( /flac$/i, "ini" )
-        File.open tagFile, "w" do | ini |
-            ini.puts tags
+        @tags = Hash.new
+
+        # Compose tag parsing command
+        tagParseCommand = Array.new
+        tagParseCommand.push "metaflac"
+        tagParseCommand.push "--export-tags-to=-"
+        tagParseCommand.push Shellwords.escape File.join( @base_directory, @relative_path )
+
+        IO.popen( tagParseCommand.join( " " ) ) do | io |
+            io.each_line do | line |
+                tag = line.chomp.split "="
+                @tags[ tag.at( 0 ).upcase ] = tag.at( 1 )
+            end
         end
 
-        return tagFile
+        # Use track number to handle disk numbers as well
+        @tags[ "TRACKNUMBER" ] = @tags[ "TRACKNUMBER" ].to_i + 100 * @tags[ "DISCNUMBER" ].to_i unless @tags[ "TRACKNUMBER" ].nil?
+
+        # Return tags
+        return @tags
     end
 
     # Write out mp3 encoded version
