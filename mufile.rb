@@ -17,6 +17,13 @@ class MuFile
         @invalid_extension_message
     end
 
+    # Enable file existence check
+    # Child classes may disable this
+    @file_should_exist = true
+    def self.file_should_exist
+        @file_should_exist
+    end
+
     # Initialize instance
     def initialize relativePath, baseDirectory = ""
 
@@ -33,7 +40,9 @@ class MuFile
         relativePath.gsub! /^#{baseDirectory}\/?/, ""
 
         # Check if file exists
-        raise "File not found" unless File.exists? File.join( baseDirectory, relativePath )
+        if self.class.file_should_exist
+            raise "File not found" unless File.exists? File.join( baseDirectory, relativePath )
+        end
 
         # Test if extensions are valid
         unless self.class.valid_extensions.empty?
