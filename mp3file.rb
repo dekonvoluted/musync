@@ -17,8 +17,8 @@ class MP3File < MuFile
         @tags = inputTags
     end
 
-    def set_art inputArtFile
-        @artFile = inputArtFile
+    def set_artPath inputPath
+        @artPath = inputPath
     end
 
     def from_wav wavData
@@ -40,7 +40,7 @@ class MP3File < MuFile
         mp3EncodeCommand.push "--tc #{Shellwords.escape @tags[ "COMMENT"]}"
         mp3EncodeCommand.push "--ty #{@tags[ "DATE"].to_i}" unless @tags[ "DATE" ].nil?
         mp3EncodeCommand.push "--tg #{Shellwords.escape @tags[ "GENRE"]}"
-        mp3EncodeCommand.push "--ti #{Shellwords.escape @artFile.path}" unless @artFile.nil?
+        mp3EncodeCommand.push "--ti #{Shellwords.escape @artPath}" unless @artPath.nil?
         mp3EncodeCommand.push "-"
         mp3EncodeCommand.push Shellwords.escape File.join( @base_directory, @relative_path )
 
