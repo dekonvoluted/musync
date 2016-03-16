@@ -7,20 +7,20 @@ class MuFile
     include FAT32
 
     # Set up class-instance variables for testing extensions
-    @valid_extensions = Array.new
     def self.valid_extensions
+        @valid_extensions = Array.new if @valid_extensions.nil?
         @valid_extensions
     end
 
-    @invalid_extension_message = "File extension is invalid"
     def self.invalid_extension_message
+        @invalid_extension_message = "File extension is invalid" if @invalid_extension_message.nil?
         @invalid_extension_message
     end
 
     # Enable file existence check
     # Child classes may disable this
-    @file_should_exist = true
     def self.file_should_exist
+        @file_should_exist = true if @file_should_exist.nil?
         @file_should_exist
     end
 
