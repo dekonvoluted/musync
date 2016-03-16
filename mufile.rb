@@ -55,12 +55,7 @@ class MuFile
 
     # Return FAT32-safe version of relative path
     def safe_relative_path
-        path = @relative_path.split "/"
-        path.map! do | dir |
-            FAT32.safename dir
-        end
-
-        return path
+        FAT32.safepath @relative_path
     end
 
     # Return full path

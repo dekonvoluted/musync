@@ -20,5 +20,15 @@ module FAT32
 
         return goodName
     end
+
+    # Return FAT32-safe path
+    def self.safepath badPath
+        safePath = badPath.split "/"
+        safePath.map! do | dir |
+            safename dir
+        end
+
+        return safePath.join "/"
+    end
 end
 
