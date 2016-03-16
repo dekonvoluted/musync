@@ -62,5 +62,10 @@ class MuFile
 
         return path
     end
+
+    # Return full path
+    def path
+        File.join @base_directory, @relative_path
+    end
 end
 
