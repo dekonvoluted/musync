@@ -33,15 +33,15 @@ class MuFile
             relativePath.gsub! /^\//, ""
         end
 
-        # Sanitize inputs
+        # Sanitize base directory
         baseDirectory = File.realpath baseDirectory
-
-        relativePath = File.realpath relativePath, baseDirectory
-        relativePath.gsub! /^#{baseDirectory}\/?/, ""
 
         # Check if file exists
         if self.class.file_should_exist
-            raise "File not found" unless File.exists? File.join( baseDirectory, relativePath )
+
+            # Sanitize relative path
+            relativePath = File.realpath relativePath, baseDirectory
+            relativePath.gsub! /^#{baseDirectory}\/?/, ""
         end
 
         # Test if extensions are valid
