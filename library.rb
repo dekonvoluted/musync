@@ -16,7 +16,11 @@ class Library
         # Gather paths to FLAC files
         @mediaFiles = Hash.new
 
+        puts "Reading library..."
+
         flacPaths = Dir.glob File.join( @path, "**", "*.flac" ), File::FNM_CASEFOLD
+
+        puts "#{flacPaths.size} FLAC files found."
 
         # Store FLAC files
         flacPaths.each do | flacPath |
@@ -34,6 +38,8 @@ class Library
         artPaths = Dir.glob File.join( @path, "**", "*.jpg" ), File::FNM_CASEFOLD
         artPaths += Dir.glob File.join( @path, "**", "*.jpeg" ), File::FNM_CASEFOLD
         artPaths += Dir.glob File.join( @path, "**", "*.png" ), File::FNM_CASEFOLD
+
+        puts "#{artPaths.size} artwork files found."
 
         # Store artwork
         artPaths.each do | artPath |
@@ -53,6 +59,8 @@ class Library
         # Sanitize input path
         downstreamBaseDirectory = File.realpath libraryPath
 
+        puts "Syncing to downstream library..."
+
         # Resize and copy album artwork
         @artFiles.each do | relativePath, artFileArray |
             artFileArray.each do | artFile |
@@ -60,6 +68,8 @@ class Library
                 # Create directory if missing
                 safeRelativeDirectory = File.join( downstreamBaseDirectory, File.dirname( artFile.safe_relative_path ) )
                 FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
+
+                puts "Syncing #{artFile.safe_relative_path}"
 
                 # Resize to destination
                 artFile.resize File.join( downstreamBaseDirectory, artFile.safe_relative_path ), "300x300"
@@ -78,6 +88,8 @@ class Library
                 # Create directory if missing
                 safeRelativeDirectory = File.join( downstreamBaseDirectory, File.dirname( flacFile.safe_relative_path ) )
                 FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
+
+                puts "Syncing #{flacFile.safe_relative_path}"
 
                 # Encode mp3 file
                 mp3File = MP3File.new flacFile.safe_relative_path.gsub( /flac$/i, "mp3" ), downstreamBaseDirectory
