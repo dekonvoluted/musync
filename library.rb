@@ -71,7 +71,7 @@ class Library
 
             # Designate destination album artwork
             artFileArray = @artFiles[ relativePath ]
-            artFile = artFileArray.at( 0 ) unless artFileArray.size > 1
+            artFile = artFileArray.at( 0 ) unless artFileArray.nil? or artFileArray.size > 1
 
             mediaFileArray.each do | flacFile |
 
