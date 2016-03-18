@@ -68,14 +68,18 @@ class Library
             artFileArray = @artFiles[ relativePath ]
             artFileArray.each do | artFile |
 
+                # Skip already existing files
+                downstreamArtFilePath = File.join downstreamBaseDirectory, artFile.safe_relative_path
+                next if File.exist? downstreamArtFilePath
+
                 # Create directory if missing
-                safeRelativeDirectory = File.join( downstreamBaseDirectory, File.dirname( artFile.safe_relative_path ) )
+                safeRelativeDirectory = File.dirname downstreamArtFilePath
                 FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
 
                 puts "Syncing #{artFile.safe_relative_path}"
 
                 # Resize to destination
-                artFile.resize File.join( downstreamBaseDirectory, artFile.safe_relative_path ), "300x300"
+                artFile.resize downstreamArtFilePath, "300x300"
             end
 
             # Designate destination album artwork
@@ -83,8 +87,12 @@ class Library
 
             mediaFileArray.each do | flacFile |
 
+                # Skip already existing files
+                downstreamMediaFilePath = File.join downstreamBaseDirectory, flacFile.safe_relative_path.gsub( /flac$/i, "mp3" )
+                next if File.exist? downstreamMediaFilePath
+
                 # Create directory if missing
-                safeRelativeDirectory = File.join( downstreamBaseDirectory, File.dirname( flacFile.safe_relative_path ) )
+                safeRelativeDirectory = File.dirname downstreamMediaFilePath
                 FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
 
                 puts "Syncing #{flacFile.safe_relative_path}"
