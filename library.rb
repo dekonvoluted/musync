@@ -66,20 +66,22 @@ class Library
 
             # Resize and copy album artwork
             artFileArray = @artFiles[ relativePath ]
-            artFileArray.each do | artFile |
+            unless artFileArray.nil?
+                artFileArray.each do | artFile |
 
-                # Skip already existing files
-                downstreamArtFilePath = File.join downstreamBaseDirectory, artFile.safe_relative_path
-                next if File.exist? downstreamArtFilePath
+                    # Skip already existing files
+                    downstreamArtFilePath = File.join downstreamBaseDirectory, artFile.safe_relative_path
+                    next if File.exist? downstreamArtFilePath
 
-                # Create directory if missing
-                safeRelativeDirectory = File.dirname downstreamArtFilePath
-                FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
+                    # Create directory if missing
+                    safeRelativeDirectory = File.dirname downstreamArtFilePath
+                    FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
 
-                puts "Syncing #{artFile.safe_relative_path}"
+                    puts "Syncing #{artFile.safe_relative_path}"
 
-                # Resize to destination
-                artFile.resize downstreamArtFilePath, "300x300"
+                    # Resize to destination
+                    artFile.resize downstreamArtFilePath, "300x300"
+                end
             end
 
             # Designate destination album artwork
