@@ -108,6 +108,9 @@ class Library
 
                     mp3File.from_wav flacFile.to_wav
                 end
+
+                # Wait a second to let log message print
+                sleep 1
             end
             Process.waitall
         end
