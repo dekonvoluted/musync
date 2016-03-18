@@ -61,8 +61,11 @@ class Library
 
         puts "Syncing to downstream library..."
 
-        # Resize and copy album artwork
-        @artFiles.each do | relativePath, artFileArray |
+        # Transcode FLAC media files
+        @mediaFiles.each do | relativePath, mediaFileArray |
+
+            # Resize and copy album artwork
+            artFileArray = @artFiles[ relativePath ]
             artFileArray.each do | artFile |
 
                 # Create directory if missing
@@ -74,13 +77,8 @@ class Library
                 # Resize to destination
                 artFile.resize File.join( downstreamBaseDirectory, artFile.safe_relative_path ), "300x300"
             end
-        end
-
-        # Transcode FLAC media files
-        @mediaFiles.each do | relativePath, mediaFileArray |
 
             # Designate destination album artwork
-            artFileArray = @artFiles[ relativePath ]
             artFile = artFileArray.at( 0 ) unless artFileArray.nil? or artFileArray.size > 1
 
             mediaFileArray.each do | flacFile |
