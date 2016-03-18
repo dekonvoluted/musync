@@ -99,7 +99,7 @@ class Library
                     safeRelativeDirectory = File.dirname downstreamMediaFilePath
                     FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
 
-                    puts "Syncing #{flacFile.safe_relative_path}"
+                    puts "Syncing #{flacFile.safe_relative_path.gsub /flac$/i, "mp3"}"
 
                     # Encode mp3 file
                     mp3File = MP3File.new flacFile.safe_relative_path.gsub( /flac$/i, "mp3" ), downstreamBaseDirectory
