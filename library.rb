@@ -87,23 +87,27 @@ class Library
 
             mediaFileArray.each do | flacFile |
 
-                # Skip already existing files
-                downstreamMediaFilePath = File.join downstreamBaseDirectory, flacFile.safe_relative_path.gsub( /flac$/i, "mp3" )
-                next if File.exist? downstreamMediaFilePath
+                fork do
 
-                # Create directory if missing
-                safeRelativeDirectory = File.dirname downstreamMediaFilePath
-                FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
+                    # Skip already existing files
+                    downstreamMediaFilePath = File.join downstreamBaseDirectory, flacFile.safe_relative_path.gsub( /flac$/i, "mp3" )
+                    next if File.exist? downstreamMediaFilePath
 
-                puts "Syncing #{flacFile.safe_relative_path}"
+                    # Create directory if missing
+                    safeRelativeDirectory = File.dirname downstreamMediaFilePath
+                    FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
 
-                # Encode mp3 file
-                mp3File = MP3File.new flacFile.safe_relative_path.gsub( /flac$/i, "mp3" ), downstreamBaseDirectory
-                mp3File.set_artPath File.join( downstreamBaseDirectory, artFile.safe_relative_path ) unless artFile.nil?
-                mp3File.set_tags flacFile.tags
+                    puts "Syncing #{flacFile.safe_relative_path}"
 
-                mp3File.from_wav flacFile.to_wav
+                    # Encode mp3 file
+                    mp3File = MP3File.new flacFile.safe_relative_path.gsub( /flac$/i, "mp3" ), downstreamBaseDirectory
+                    mp3File.set_artPath File.join( downstreamBaseDirectory, artFile.safe_relative_path ) unless artFile.nil?
+                    mp3File.set_tags flacFile.tags
+
+                    mp3File.from_wav flacFile.to_wav
+                end
             end
+            Process.waitall
         end
     end
 end
