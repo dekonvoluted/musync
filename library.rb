@@ -109,8 +109,8 @@ class Library
                     mp3File.from_wav flacFile.to_wav
                 end
 
-                # Wait a second to let log message print
-                sleep 1
+                # Introduce a short delay to avoid status message race
+                sleep 0.2
             end
             Process.waitall
         end
