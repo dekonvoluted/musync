@@ -14,7 +14,9 @@ class Library
         @path = File.realpath libraryPath
 
         # Gather paths to FLAC files
-        @mediaFiles = Hash.new
+        @mediaFiles = Hash.new do | hash, key |
+            hash[ key ] = Array.new
+        end
 
         puts "Reading library..."
 
@@ -26,14 +28,14 @@ class Library
         flacPaths.each do | flacPath |
             relativePath = flacPath.gsub /^#{@path}\/?/, ""
             relativeDirectory = File.dirname relativePath
-            @mediaFiles[ relativeDirectory ] = Array.new if @mediaFiles[ relativeDirectory ].nil?
-
             flacFile = FlacFile.new relativePath, @path
             @mediaFiles[ relativeDirectory ].push flacFile
         end
 
         # Gather paths to album artwork
-        @artFiles = Hash.new
+        @artFiles = Hash.new do | hash, key |
+            hash[ key ] = Array.new
+        end
 
         artPaths = Dir.glob File.join( @path, "**", "*.jpg" ), File::FNM_CASEFOLD
         artPaths += Dir.glob File.join( @path, "**", "*.jpeg" ), File::FNM_CASEFOLD
@@ -45,8 +47,6 @@ class Library
         artPaths.each do | artPath |
             relativePath = artPath.gsub /^#{@path}\/?/, ""
             relativeDirectory = File.dirname relativePath
-            @artFiles[ relativeDirectory ] = Array.new if @artFiles[ relativeDirectory ].nil?
-
             artFile = ArtFile.new relativePath, @path
             @artFiles[ relativeDirectory ].push artFile
         end
