@@ -87,6 +87,7 @@ class Library
 
             mediaFileArray.each do | flacFile |
 
+                # Handle encoding of songs with same relative path in parallel
                 fork do
 
                     # Skip already existing files
@@ -110,6 +111,8 @@ class Library
                 # Introduce a short delay to avoid status message race
                 sleep 0.2
             end
+
+            # Wait till all songs with the same relative path have been encoded
             Process.waitall
         end
     end
