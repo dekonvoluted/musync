@@ -61,8 +61,26 @@ class Library
 
         puts "Syncing to downstream library..."
 
-        # Transcode FLAC media files
+        # Determine files to transcode
+        mediaFilesToTranscode = Hash.new do | hash, key |
+            hash[ key ] = Array.new
+        end
+
+        totalCount = 0
         @mediaFiles.each do | relativePath, mediaFileArray |
+            mediaFileArray.each do | flacFile |
+                downstreamMediaFilePath = File.join downstreamBaseDirectory, flacFile.safe_relative_path.gsub( /flac$/i, "mp3" )
+                next if File.exist? downstreamMediaFilePath
+                mediaFilesToTranscode[ relativePath ].push flacFile
+                totalCount += 1
+            end
+        end
+
+        puts "#{totalCount} files to sync."
+
+        count = 1
+        # Transcode FLAC media files
+        mediaFilesToTranscode.each do | relativePath, mediaFileArray |
 
             # Resize and copy album artwork
             artFileArray = @artFiles[ relativePath ]
@@ -76,7 +94,7 @@ class Library
                 safeRelativeDirectory = File.dirname downstreamArtFilePath
                 FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
 
-                puts "Syncing #{artFile.safe_relative_path}"
+                puts "[#{count}/#{totalCount}] Syncing #{artFile.safe_relative_path}"
 
                 # Resize to destination
                 artFile.resize downstreamArtFilePath, "300x300"
@@ -98,8 +116,7 @@ class Library
                     safeRelativeDirectory = File.dirname downstreamMediaFilePath
                     FileUtils.mkpath safeRelativeDirectory unless Dir.exist? safeRelativeDirectory
 
-                    puts "Syncing #{flacFile.safe_relative_path.gsub /flac$/i, "mp3"}"
-
+                    puts "[#{count}/#{totalCount}] Syncing #{flacFile.safe_relative_path.gsub /flac$/i, "mp3"}"
                     # Encode mp3 file
                     mp3File = MP3File.new flacFile.safe_relative_path.gsub( /flac$/i, "mp3" ), downstreamBaseDirectory
                     mp3File.set_artPath File.join( downstreamBaseDirectory, artFile.safe_relative_path ) unless artFile.nil?
@@ -107,6 +124,8 @@ class Library
 
                     mp3File.from_wav flacFile.to_wav
                 end
+
+                count += 1
 
                 # Introduce a short delay to avoid status message race
                 sleep 0.2
