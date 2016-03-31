@@ -128,7 +128,7 @@ class Library
                 count += 1
 
                 # Introduce a short delay to avoid status message race
-                sleep 0.2
+                sleep 0.1
             end
 
             # Wait till all songs with the same relative path have been encoded
