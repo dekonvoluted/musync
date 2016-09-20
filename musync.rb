@@ -20,7 +20,8 @@ if __FILE__ == $0
     optparse.parse!
 
     # Accept two arguments
-    raise ArgumentError, "Too many arguments" unless ARGV.length == 2
+    raise ArgumentError, "Too few arguments" unless ARGV.length > 1
+    raise ArgumentError, "Too many arguments" if ARGV.length > 2
 
     # Ensure upstream library exists
     FLACDIR = ARGV.at 0
