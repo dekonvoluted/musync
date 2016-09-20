@@ -8,6 +8,9 @@ require "fileutils"
 require "optparse"
 
 if __FILE__ == $0
+
+    ARGV.push "-h" if ARGV.empty?
+
     optparse = OptionParser.new do | opts |
         opts.banner = "Usage: #{$0} [FLAC library] [MP3 library]"
 
